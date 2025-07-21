@@ -1,0 +1,13 @@
+- hosts: all
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  roles:
+    - common
+    - geerlingguy.ruby
+    - geerlingguy.mysql
+    - redmine
+#    - geerlingguy.nginx
+#    - puma

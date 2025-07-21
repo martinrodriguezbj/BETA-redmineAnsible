@@ -1,0 +1,37 @@
+- name: Instalar dependencias de Redmine
+  shell: |
+    bundle config set --local without "development test"
+    bundle install
+  args:
+    chdir: "{{ redmine_root }}"
+  become_user: "{{ vagrant_user }}"
+
+- name: Generar secret token
+  shell: bundle exec rake generate_secret_token
+  args:
+    chdir: "{{ redmine_root }}"
+  become_user: "{{ vagrant_user }}"
+
+- name: Migrar base de datos
+  shell: RAILS_ENV=production bundle exec rake db:migrate
+  args:
+    chdir: "{{ redmine_root }}"
+  become_user: "{{ vagrant_user }}"
+
+- name: Cargar datos por defecto
+  shell: RAILS_ENV=production bundle exec rake redmine:load_default_data <<< "es"
+  args:
+    chdir: "{{ redmine_root }}"
+  become_user: "{{ vagrant_user }}"
+
+- name: Crear servicio redmine
+  template:
+    src: redmine.service.j2
+    dest: /etc/systemd/system/redmine.service
+
+- name: Habilitar redmine como servicio
+  systemd:
+    name: redmine
+    enabled: yes
+    state: started
+    daemon_reload: yes

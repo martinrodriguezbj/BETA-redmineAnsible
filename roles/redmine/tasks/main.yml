@@ -1,0 +1,25 @@
+- name: Descargar Redmine
+  unarchive:
+    src: "https://www.redmine.org/releases/redmine-{{ redmine_version }}.zip"
+    dest: /opt
+    remote_src: yes
+    creates: "{{ redmine_root }}"
+
+- name: Renombrar redmine descargado
+  command: mv /opt/redmine-{{ redmine_version }} {{ redmine_root }}
+  args:
+    creates: "{{ redmine_root }}"
+
+- name: Cambiar permisos del redmine_root
+  file:
+    path: "{{ redmine_root }}"
+    owner: "{{ redmine_user }}"
+    group: "{{ redmine_group }}"
+    recurse: yes
+
+- name: Copiar configuración de base de datos
+  template:
+    src: database.yml.j2
+    dest: "{{ redmine_root }}/config/database.yml"
+    owner: "{{ redmine_user }}"
+    group: "{{ redmine_group }}"
