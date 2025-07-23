@@ -1,15 +1,9 @@
-ruby_version: "3.2.0"
-
-ruby_install_gems:
-  - bundler
-  - puma
-
 # Usuarios y rutas
 redmine_user: redmine
 redmine_group: redmine
 vagrant_user: vagrant
 vagrant_home: /home/vagrant
-redmine_version: 5.1.1
+redmine_version: 6.0.5
 redmine_root: /opt/redmine
 
 # Base de datos
@@ -29,3 +23,35 @@ mysql_users:
     host: localhost
     password: redmine123
     priv: "redmine.*:ALL"
+
+# asdf
+asdf_user: root
+asdf_group: redmine
+asdf_dir: /home/redmine/.asdf
+asdf_plugins:
+  - name: ruby
+    versions: ["3.2.0"]
+    global: "3.2.0"
+asdf_legacy_version_file: "yes"
+
+# geerlingguy.nginx
+
+nginx_remove_default_vhost: true
+
+nginx_vhosts:
+  - listen: "80"
+    server_name: "mikroways.redmine www.mikroways.redmine"
+    root: "/opt/redmine/public"
+    index: "index.html index.htm"
+    extra_parameters: |
+      location /assets/ {
+          expires max;
+          access_log off;
+      }
+      location / {
+          proxy_pass http://localhost:3001;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+      }

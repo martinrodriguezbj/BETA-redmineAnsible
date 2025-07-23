@@ -3,7 +3,6 @@
     name:
       - build-essential
       - zlib1g-dev
-      - libmariadb-dev
       - git
       - coreutils
       - libffi-dev
@@ -12,22 +11,12 @@
       - unzip
       - curl
       - sudo
+      - ruby-dev
+      - libmysqlclient-dev
     update_cache: yes
-
-- name: Crear grupo redmine
-  group:
-    name: "{{ redmine_group }}"
-    state: present
 
 - name: Crear usuario redmine
   user:
     name: "{{ redmine_user }}"
-    group: "{{ redmine_group }}"
     shell: /bin/bash
     create_home: yes
-
-- name: Agregar vagrant al grupo redmine
-  user:
-    name: "{{ vagrant_user }}"
-    groups: "{{ redmine_group }}"
-    append: yes

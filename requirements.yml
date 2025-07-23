@@ -1,4 +1,1 @@
 roles:
-  - name: geerlingguy.ruby
-  - name: geerlingguy.mysql
-  - name: geerlingguy.nginx
