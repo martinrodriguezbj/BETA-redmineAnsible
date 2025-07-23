@@ -1,5 +1,0 @@
-- name: Copiar config nginx para redmine
-  template:
-    src: mikroways.redmine.j2
-    dest: /etc/nginx/conf.d/mikroways.redmine.conf
-  notify: Restart nginx
