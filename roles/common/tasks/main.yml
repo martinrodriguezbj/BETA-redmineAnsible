@@ -1,5 +1,5 @@
 - name: Instalar dependencias base
-  apt:
+  ansible.builtin.apt:
     name:
       - build-essential
       - zlib1g-dev
@@ -13,10 +13,10 @@
       - sudo
       - ruby-dev
       - libmysqlclient-dev
-    update_cache: yes
+    update_cache: true
 
 - name: Crear usuario redmine
-  user:
+  ansible.builtin.user:
     name: "{{ redmine_user }}"
     shell: /bin/bash
-    create_home: yes
+    create_home: true

@@ -1,0 +1,18 @@
+# --- Archivos del sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+
+# --- Ansible ---
+*.retry
+*.log
+
+# --- Vagrant ---
+.vagrant/
+
+# --- Archivos de configuración sensibles---
+vars.local.yml

@@ -1,34 +1,35 @@
-- hosts: all
-  become: yes
+- name: Desplegar infraestructura completa
+  hosts: all
+  become: true
 
   vars_files:
     - vars.yml
 
   tasks:
     - name: Ejecutar role common
-      include_role:
+      ansible.builtin.include_role:
         name: common
 
     - name: Ejecutar role asdf
-      include_role:
+      ansible.builtin.include_role:
         name: cimon-io.asdf
 
     - name: Cambiar dueño del directorio .asdf (justo después del role asdf)
-      file:
+      ansible.builtin.file:
         path: /home/redmine/.asdf
         state: directory
-        recurse: yes
+        recurse: true
         owner: redmine
         group: redmine
 
     - name: Ejecutar role geerlingguy.mysql
-      include_role:
+      ansible.builtin.include_role:
         name: geerlingguy.mysql
 
     - name: Descargar e instalar redmine
-      include_role:
+      ansible.builtin.include_role:
         name: redmine
 
     - name: Ejecutar role geerlingguy.nginx
-      include_role:
+      ansible.builtin.include_role:
         name: geerlingguy.nginx

@@ -1,48 +1,47 @@
-#descarga de Redmine
+# descarga de Redmine
 
 - name: Descargar Redmine
-  unarchive:
+  ansible.builtin.unarchive:
     src: "https://www.redmine.org/releases/redmine-{{ redmine_version }}.zip"
     dest: /opt
-    remote_src: yes
+    remote_src: true
     creates: "{{ redmine_root }}"
 
 - name: Renombrar redmine descargado
-  command: mv /opt/redmine-{{ redmine_version }} {{ redmine_root }}
+  ansible.builtin.command: mv /opt/redmine-{{ redmine_version }} {{ redmine_root }}
   args:
     creates: "{{ redmine_root }}"
 
 - name: Cambiar permisos del redmine_root
-  file:
+  ansible.builtin.file:
     path: "{{ redmine_root }}"
     owner: "{{ redmine_user }}"
     group: "{{ redmine_group }}"
-    recurse: yes
+    recurse: true
 
 # Configuracion Redmine
 
 - name: Añadir Puma al Gemfile.local
-  copy:
+  ansible.builtin.copy:
     dest: "{{ redmine_root }}/Gemfile.local"
     content: "gem 'puma'\n"
     owner: "{{ redmine_user }}"
     group: "{{ redmine_group }}"
     mode: '0644'
 
-
 - name: Generar archivo database.yml
-  template:
+  ansible.builtin.template:
     src: database.yml.j2
     dest: "{{ redmine_root }}/config/database.yml"
     owner: "{{ redmine_user }}"
     group: "{{ redmine_group }}"
     mode: '0640'
 
-#quizas sea mala practica agrupar tanto, pero sino tenia problemas..
+# Quizas sea mala practica agrupar tanto, pero sino tenia problemas..
 - name: Instalar dependencias y configurar Redmine
   become: true
   become_user: "{{ redmine_user }}"
-  shell: |
+  ansible.builtin.shell: |
     /bin/bash -lc '
       # Configurar bundle
       bundle config set --local without "development test"
@@ -59,24 +58,25 @@
     '
   args:
     chdir: "{{ redmine_root }}"
-
+  changed_when: false
 
 - name: Quitar permisos de ejecución en archivos de redmine
-  shell: |
+  ansible.builtin.shell: |
     find files log tmp public/assets -type f -exec chmod -x {} +
   args:
     chdir: "{{ redmine_root }}"
+  changed_when: false
 
-#Configuracion Redmine systemd
+# Configuracion Redmine systemd
 
 - name: Establecer config.public_file_server.enabled en false dentro de production.rb
-  replace:
+  ansible.builtin.replace:
     path: "{{ redmine_root }}/config/environments/production.rb"
     regexp: '^\s*#?\s*config\.public_file_server\.enabled\s*=.*'
     replace: '  config.public_file_server.enabled = false'
 
 - name: Instalar servicio systemd redmine
-  template:
+  ansible.builtin.template:
     src: redmine.service.j2
     dest: /etc/systemd/system/redmine.service
     owner: root
@@ -85,10 +85,10 @@
 
 - name: Recargar systemd
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
 
 - name: Habilitar y arrancar el servicio redmine
   ansible.builtin.systemd:
     name: redmine.service
-    enabled: yes
+    enabled: true
     state: started

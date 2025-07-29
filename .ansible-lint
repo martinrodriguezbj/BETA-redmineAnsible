@@ -1,0 +1,8 @@
+exclude_paths:
+  - roles/cimon-io.asdf/
+  - roles/geerlingguy.mysql/
+  - roles/geerlingguy.nginx/
+  - poetry.lock
+  - pyproject.toml
+  - Vagrantfile
+  - readme.md
