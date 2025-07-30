@@ -1,3 +1,7 @@
+# BETA-redmineAnsible
+
+[![Molecule CI](https://github.com/martinrodriguezbj/BETA-redmineAnsible/actions/workflows/molecule-ci.yml/badge.svg?branch=main)](https://github.com/martinrodriguezbj/BETA-redmineAnsible/actions)
+
 Guía de Instalación y Aprovisionamiento - redmine-ansible
 
 Preparación del Entorno (Configuración Inicial)
