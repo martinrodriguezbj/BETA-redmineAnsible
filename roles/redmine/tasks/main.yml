@@ -19,12 +19,38 @@
     group: "{{ redmine_group }}"
     recurse: true
 
+- name: Corregir permisos en .asdf antes de bundle # agregado por docker
+  ansible.builtin.file:
+    path: /home/redmine/.asdf
+    state: directory
+    owner: "{{ redmine_user }}"
+    group: "{{ redmine_user }}"
+    recurse: true
+
+- name: Crear y dar permisos a /opt/.bundle para redmine # agregado por docker
+  ansible.builtin.file:
+    path: /opt/.bundle
+    state: directory
+    owner: "{{ redmine_user }}"
+    group: "{{ redmine_user }}"
+    mode: "0755"
+
 # Configuracion Redmine
 
-- name: Añadir Puma al Gemfile.local
+# - name: Añadir Puma al Gemfile.local
+#  ansible.builtin.copy:
+#    dest: "{{ redmine_root }}/Gemfile.local"
+#    content: "gem 'puma'\n"
+#    owner: "{{ redmine_user }}"
+#    group: "{{ redmine_group }}"
+#    mode: '0644'
+
+- name: Añadir gemas adicionales al Gemfile.local
   ansible.builtin.copy:
     dest: "{{ redmine_root }}/Gemfile.local"
-    content: "gem 'puma'\n"
+    content: |
+      gem 'puma'
+      gem 'tzinfo-data' # esto por docker
     owner: "{{ redmine_user }}"
     group: "{{ redmine_group }}"
     mode: '0644'

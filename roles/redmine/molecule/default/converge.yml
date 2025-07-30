@@ -1,0 +1,12 @@
+---
+- name: Test Redmine stack completo
+  hosts: all
+  become: true
+  vars_files:
+    - ../../../../vars.yml
+  roles:
+    - ../../../common
+    - ../../../cimon-io.asdf
+    - ../../../geerlingguy.mysql
+    - ../../../redmine
+    - ../../../geerlingguy.nginx

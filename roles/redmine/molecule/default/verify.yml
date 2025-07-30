@@ -1,0 +1,69 @@
+---
+- name: Verificar instalación y configuración de Redmine
+  hosts: all
+  gather_facts: false
+
+  vars_files:
+    - /home/mikroways/Desktop/redmine-entrega1/BETA-redmineAnsible/vars.yml
+
+  tasks:
+    - name: Verificar que Redmine está descargado y descomprimido
+      ansible.builtin.stat:
+        path: "{{ redmine_root }}"
+      register: redmine_stat
+
+    - name: Verificar que la instalación de Redmine fue exitosa
+      ansible.builtin.fail:
+        msg: "El directorio de Redmine no se encuentra en {{ redmine_root }}."
+      when: not redmine_stat.stat.exists
+
+    - name: Verificar que el archivo Gemfile.local contiene Puma
+      ansible.builtin.slurp:
+        src: "{{ redmine_root }}/Gemfile.local"
+      register: gemfile_local_content
+
+    - name: Verificar que Puma está presente en Gemfile.local
+      ansible.builtin.assert:
+        that:
+          - "\"gem 'puma'\" in (gemfile_local_content.content | b64decode)"
+        fail_msg: "El gem 'puma' no está presente en el Gemfile.local"
+
+    - name: Verificar que el archivo database.yml fue creado
+      ansible.builtin.stat:
+        path: "{{ redmine_root }}/config/database.yml"
+      register: database_yml_stat
+
+    - name: Verificar que el archivo database.yml existe
+      ansible.builtin.fail:
+        msg: "El archivo database.yml no fue creado."
+      when: not database_yml_stat.stat.exists
+
+    - name: Verificar que las migraciones de la base de datos fueron ejecutadas
+      ansible.builtin.shell: bash -l -c "cd {{ redmine_root }} && bundle exec rake db:migrate RAILS_ENV=production --dry-run"
+      register: db_migrate_check
+      changed_when: false
+
+    - name: Verificar que el servicio Redmine está habilitado y en ejecución
+      ansible.builtin.systemd:
+        name: redmine.service
+        enabled: true
+        state: started
+      register: redmine_service_status
+
+    - name: Verificar que el servicio Redmine está en ejecución
+      ansible.builtin.assert:
+        that:
+          - redmine_service_status.state == 'started'
+        fail_msg: "El servicio Redmine no está en ejecución."
+
+    - name: Verificar que los permisos fueron correctamente configurados
+      ansible.builtin.shell: |
+        find {{ redmine_root }} -type f -exec stat --format="%A %n" {} \;
+      register: file_permissions_check
+      changed_when: false
+
+    - name: Verificar que los permisos de los archivos son correctos
+      ansible.builtin.assert:
+        that:
+          - "'rwxr-xr-x' in file_permissions_check.stdout"
+        fail_msg: "Los permisos de los archivos no están configurados correctamente."

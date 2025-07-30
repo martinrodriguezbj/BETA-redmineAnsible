@@ -1,0 +1,26 @@
+---
+- name: Preparar entorno para role Redmine
+  hosts: all
+  become: true
+  tasks:
+    - name: Crear usuario redmine si no existe
+      ansible.builtin.user:
+        name: redmine
+        shell: /bin/bash
+        create_home: yes
+
+    - name: Asegurar permisos en home de redmine
+      ansible.builtin.file:
+        path: /home/redmine
+        state: directory
+        owner: redmine
+        group: redmine
+        recurse: yes
+
+    - name: Crear y dar permisos a /opt/.bundle para redmine
+      ansible.builtin.file:
+        path: /opt/.bundle
+        state: directory
+        owner: redmine
+        group: redmine
+        mode: "0755"

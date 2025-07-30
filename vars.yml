@@ -7,6 +7,9 @@ redmine_version: 6.0.5
 redmine_root: /opt/redmine
 
 # Base de datos
+#mysql_service_enabled: false
+#mysql_service_state: started
+
 mysql_root_password: "rootpass123"
 
 mysql_user: "redmine"
